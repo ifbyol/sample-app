@@ -1,0 +1,23 @@
+build:
+  booking-management:
+    context: ./booking-management
+
+deploy:
+  compose: docker-compose.yml
+
+dev:
+  booking-management:
+    image: booking-management
+    command: bash
+    workdir: /app
+    sync:
+      - ./booking-management:/app
+    forward:
+      - 8080:8080
+    environment:
+      - PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=booking_management
