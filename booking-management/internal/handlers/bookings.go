@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"booking-management/internal/database"
+	"booking-management/internal/logger"
 	"booking-management/internal/models"
 )
 
@@ -17,6 +18,9 @@ func NewBookingHandler(db *database.DB) *BookingHandler {
 }
 
 func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	logger.Info(ctx, "Fetching bookings")
+
 	query := `
 		SELECT id, user_id, room_id, number_of_guests, start_date, end_date, created_at, updated_at
 		FROM bookings
@@ -25,6 +29,7 @@ func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := h.db.Query(query)
 	if err != nil {
+		logger.Error(ctx, "Failed to fetch bookings from database", "error", err)
 		http.Error(w, "Failed to fetch bookings", http.StatusInternalServerError)
 		return
 	}
@@ -44,6 +49,7 @@ func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 			&booking.UpdatedAt,
 		)
 		if err != nil {
+			logger.Error(ctx, "Failed to scan booking", "error", err)
 			http.Error(w, "Failed to scan booking", http.StatusInternalServerError)
 			return
 		}
@@ -51,14 +57,18 @@ func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = rows.Err(); err != nil {
+		logger.Error(ctx, "Error iterating bookings", "error", err)
 		http.Error(w, "Error iterating bookings", http.StatusInternalServerError)
 		return
 	}
+
+	logger.Info(ctx, "Successfully fetched bookings", "count", len(bookings))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(bookings); err != nil {
+		logger.Error(ctx, "Failed to encode response", "error", err)
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}

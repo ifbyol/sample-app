@@ -3,12 +3,15 @@ package router
 import (
 	"booking-management/internal/database"
 	"booking-management/internal/handlers"
+	"booking-management/internal/middleware"
 
 	"github.com/gorilla/mux"
 )
 
 func NewRouter(db *database.DB) *mux.Router {
 	router := mux.NewRouter()
+
+	router.Use(middleware.BaggageMiddleware)
 
 	healthHandler := handlers.NewHealthHandler()
 	userHandler := handlers.NewUserHandler(db)

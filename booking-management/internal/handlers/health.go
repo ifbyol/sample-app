@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"booking-management/internal/logger"
 )
 
 type HealthResponse struct {
@@ -19,6 +21,9 @@ func NewHealthHandler() *HealthHandler {
 }
 
 func (h *HealthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	logger.Info(ctx, "Health check requested")
+
 	response := HealthResponse{
 		Status:    "healthy",
 		Timestamp: time.Now(),
@@ -29,7 +34,10 @@ func (h *HealthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
+		logger.Error(ctx, "Failed to encode health response", "error", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+
+	logger.Info(ctx, "Health check completed successfully")
 }

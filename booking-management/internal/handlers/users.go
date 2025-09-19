@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"booking-management/internal/database"
+	"booking-management/internal/logger"
 	"booking-management/internal/models"
 )
 
@@ -17,6 +18,9 @@ func NewUserHandler(db *database.DB) *UserHandler {
 }
 
 func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	logger.Info(ctx, "Fetching users")
+
 	query := `
 		SELECT id, email, username, date_of_birth, name, surname, created_at, updated_at
 		FROM users
@@ -25,6 +29,7 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := h.db.Query(query)
 	if err != nil {
+		logger.Error(ctx, "Failed to fetch users from database", "error", err)
 		http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
 		return
 	}
@@ -44,6 +49,7 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 			&user.UpdatedAt,
 		)
 		if err != nil {
+			logger.Error(ctx, "Failed to scan user", "error", err)
 			http.Error(w, "Failed to scan user", http.StatusInternalServerError)
 			return
 		}
@@ -51,14 +57,18 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = rows.Err(); err != nil {
+		logger.Error(ctx, "Error iterating users", "error", err)
 		http.Error(w, "Error iterating users", http.StatusInternalServerError)
 		return
 	}
+
+	logger.Info(ctx, "Successfully fetched users", "count", len(users))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(users); err != nil {
+		logger.Error(ctx, "Failed to encode response", "error", err)
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
