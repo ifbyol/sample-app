@@ -35,6 +35,9 @@ okteto deploy --remote
 # Start development environment with live sync
 okteto up
 
+# Once inside the development container, build and start the service
+make build && make start
+
 # Access API endpoints from within the development container
 curl http://localhost:8080/healthz
 curl http://localhost:8080/users

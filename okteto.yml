@@ -7,7 +7,7 @@ deploy:
 
 dev:
   booking-management:
-    image: booking-management
+    image: okteto/golang:1
     command: bash
     workdir: /app
     sync:
