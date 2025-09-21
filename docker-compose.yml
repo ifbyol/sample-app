@@ -28,6 +28,15 @@ services:
       - NODE_ENV=production
       - LOG_LEVEL=info
 
+  booking:
+    build:
+      context: ./booking
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+
   postgres:
     image: postgres:latest
     environment:

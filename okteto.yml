@@ -3,6 +3,8 @@ build:
     context: ./booking-management
   payments:
     context: ./payments
+  booking:
+    context: ./booking
 
 deploy:
   compose: docker-compose.yml
@@ -44,3 +46,14 @@ dev:
       - PORT=3000
       - NODE_ENV=development
       - LOG_LEVEL=debug
+
+  booking:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./booking:/app
+    forward:
+      - 8081:8081
+    environment:
+      - PORT=8081
