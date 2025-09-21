@@ -1,6 +1,8 @@
 build:
   booking-management:
     context: ./booking-management
+  payments:
+    context: ./payments
 
 deploy:
   compose: docker-compose.yml
@@ -21,3 +23,16 @@ dev:
       - DB_USER=postgres
       - DB_PASS=postgres
       - DB_NAME=booking_management
+
+  payments:
+    image: okteto/node:20
+    command: bash
+    workdir: /app
+    sync:
+      - ./payments:/app
+    forward:
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
