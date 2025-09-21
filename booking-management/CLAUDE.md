@@ -28,7 +28,6 @@ booking-management/
 ### Prerequisites
 - Go 1.24+
 - PostgreSQL (when running locally)
-- Docker & Docker Compose
 - Make (optional, for convenience commands)
 
 ### Local Development Commands
@@ -57,16 +56,6 @@ Configure these environment variables:
 - `DB_NAME` - Database name (default: booking_management)
 
 ## Deployment
-
-### Docker Compose (Root Level)
-The service is deployed using docker-compose from the repository root:
-```bash
-# Deploy all services
-docker-compose up --build
-
-# Deploy in background
-docker-compose up -d --build
-```
 
 ### Okteto Cloud
 For cloud deployment:
