@@ -23,7 +23,7 @@ const baggageMiddleware = (req, res, next) => {
  * @returns {string} - Baggage header value
  */
 const getBaggageFromRequest = (req) => {
-  return req.baggage || '';
+  return req?.baggage || '';
 };
 
 module.exports = {
