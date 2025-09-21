@@ -7,6 +7,14 @@ build:
 deploy:
   compose: docker-compose.yml
 
+test:
+  payments:
+    image: okteto/node:20
+    context: ./payments
+    commands:
+      - npm install
+      - npm test
+
 dev:
   booking-management:
     image: okteto/golang:1

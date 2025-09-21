@@ -84,3 +84,15 @@ npm install && npm start
 curl http://localhost:3000/health
 curl -H "Content-Type: application/json" -d '{"paymentId":"pay_123","cardNumber":"4242424242424242"}' http://localhost:3000/process-payment
 ```
+
+**Testing with Okteto:**
+```bash
+# Run comprehensive test suite in Okteto cloud environment
+okteto test payments
+
+# The test suite includes:
+# - Unit tests for middleware, utilities, and routes (41 tests)
+# - Integration tests for full application flow (13 tests)
+# - Baggage header propagation validation
+# - Payment processing and error handling scenarios
+```
