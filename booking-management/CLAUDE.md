@@ -57,8 +57,8 @@ Configure these environment variables:
 
 ## Deployment
 
-### Okteto Cloud
-For cloud deployment:
+### Okteto
+For deployment:
 ```bash
 # Deploy to Okteto
 okteto deploy --remote

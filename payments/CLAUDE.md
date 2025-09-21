@@ -58,8 +58,8 @@ Configure these environment variables:
 
 ## Deployment
 
-### Okteto Cloud
-For cloud deployment and testing:
+### Okteto
+For deployment and testing:
 ```bash
 # Deploy to Okteto
 okteto deploy --remote
@@ -69,7 +69,7 @@ okteto up
 # Then inside container:
 npm install && npm start
 
-# Run tests in Okteto cloud
+# Run tests in Okteto
 okteto test payments
 ```
 
@@ -167,7 +167,7 @@ npm run test:coverage
 # Run tests in watch mode during development
 npm run test:watch
 
-# Run tests in Okteto cloud environment
+# Run tests in Okteto environment
 okteto test payments
 ```
 
@@ -383,7 +383,7 @@ app.get('/health', (req, res) => {
 ### Test Monitoring
 - 54 total tests with comprehensive coverage
 - Integration tests validate end-to-end functionality
-- Okteto cloud testing for environment validation
+- Okteto testing for environment validation
 
 ## Common Patterns
 

@@ -87,7 +87,7 @@ curl -H "Content-Type: application/json" -d '{"paymentId":"pay_123","cardNumber"
 
 **Testing with Okteto:**
 ```bash
-# Run comprehensive test suite in Okteto cloud environment
+# Run comprehensive test suite in Okteto environment
 okteto test payments
 
 # The test suite includes:
