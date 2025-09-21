@@ -57,3 +57,4 @@ dev:
       - 8081:8081
     environment:
       - PORT=8081
+      - KAFKA_BROKERS=kafka:9092
