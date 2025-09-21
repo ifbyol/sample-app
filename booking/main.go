@@ -1,77 +1,38 @@
 package main
 
 import (
-	"encoding/json"
-	"log/slog"
+	"context"
+	"fmt"
+	"log"
 	"net/http"
-	"os"
 	"time"
 
-	"github.com/gorilla/mux"
+	"booking/internal/config"
+	"booking/internal/logger"
+	"booking/internal/router"
 )
 
-// HealthResponse represents the health check response
-type HealthResponse struct {
-	Status    string `json:"status"`
-	Service   string `json:"service"`
-	Timestamp string `json:"timestamp"`
-}
-
-// healthHandler handles the health check endpoint
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	slog.Info("Health check requested")
-
-	response := HealthResponse{
-		Status:    "healthy",
-		Service:   "booking-service",
-		Timestamp: time.Now().UTC().Format(time.RFC3339),
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		slog.Error("Failed to encode health response", "error", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	slog.Info("Health check completed successfully")
-}
-
 func main() {
-	// Setup structured logging
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	}))
-	slog.SetDefault(logger)
+	ctx := context.Background()
+	cfg := config.Load()
 
-	// Get port from environment variable or use default
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8081"
-	}
+	logger.Info(ctx, "Starting booking service", "port", cfg.Port)
 
-	// Create router
-	r := mux.NewRouter()
+	r := router.NewRouter()
 
-	// Health endpoint
-	r.HandleFunc("/health", healthHandler).Methods("GET")
-
-	// Setup server
 	server := &http.Server{
-		Addr:         ":" + port,
+		Addr:         ":" + cfg.Port,
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	slog.Info("Starting booking service", "port", port)
+	logger.Info(ctx, "Booking service ready to serve requests", "address", server.Addr)
+	fmt.Printf("Booking service starting on port %s...\n", cfg.Port)
 
-	// Start server
 	if err := server.ListenAndServe(); err != nil {
-		slog.Error("Server failed to start", "error", err)
-		os.Exit(1)
+		logger.Error(ctx, "Server failed to start", "error", err)
+		log.Fatal(err)
 	}
 }
