@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Port          string
 	KafkaBrokers  []string
+	PaymentServiceURL string
 }
 
 func Load() *Config {
@@ -22,6 +23,7 @@ func Load() *Config {
 	return &Config{
 		Port:         getEnv("PORT", "8081"),
 		KafkaBrokers: brokers,
+		PaymentServiceURL: getEnv("PAYMENT_SERVICE_URL", "http://payments:3000"),
 	}
 }
 

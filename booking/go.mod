@@ -4,10 +4,12 @@ go 1.24.0
 
 toolchain go1.24.3
 
-require github.com/gorilla/mux v1.8.0
+require (
+	github.com/IBM/sarama v1.46.1
+	github.com/gorilla/mux v1.8.0
+)
 
 require (
-	github.com/IBM/sarama v1.46.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eapache/go-resiliency v1.7.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect

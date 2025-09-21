@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"booking/internal/client"
 	"booking/internal/config"
+	"booking/internal/kafka"
 	"booking/internal/logger"
 	"booking/internal/router"
 )
@@ -18,10 +20,21 @@ func main() {
 
 	logger.Info(ctx, "Starting booking service", "port", cfg.Port)
 
-	r := router.NewRouter()
+	// Initialize Kafka client
+	kafkaClient, err := kafka.NewClient(cfg.KafkaBrokers)
+	if err != nil {
+		logger.Error(ctx, "Failed to create Kafka client", "error", err)
+		log.Fatal(err)
+	}
+	defer kafkaClient.Close()
+
+	// Initialize payment client
+	paymentClient := client.NewPaymentClient(cfg.PaymentServiceURL)
+
+	r := router.NewRouter(paymentClient, kafkaClient)
 
 	server := &http.Server{
-		Addr:         ":" + cfg.Port,
+		Addr:         fmt.Sprintf(":%s", cfg.Port),
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
