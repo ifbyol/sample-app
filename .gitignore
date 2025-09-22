@@ -39,3 +39,10 @@ booking-management/booking
 booking-management/bin/
 worker/worker
 worker/bin/
+
+# Admin service
+admin/node_modules/
+admin/npm-debug.log*
+admin/yarn-debug.log*
+admin/yarn-error.log*
+admin/.env

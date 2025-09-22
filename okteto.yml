@@ -7,6 +7,8 @@ build:
     context: ./booking
   worker:
     context: ./worker
+  admin:
+    context: ./admin
 
 deploy:
   compose: docker-compose.yml
@@ -74,3 +76,21 @@ dev:
       - DB_PASSWORD=postgres
       - DB_NAME=booking_management
       - KAFKA_BROKERS=kafka:9092
+
+  admin:
+    image: okteto/node:20
+    command: bash
+    workdir: /app
+    sync:
+      - ./admin:/app
+    forward:
+      - 3001:3001
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_NAME=admin_db
