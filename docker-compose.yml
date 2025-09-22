@@ -64,6 +64,23 @@ services:
       KAFKA_LOG_DIRS: '/opt/kafka/logs'
       CLUSTER_ID: 'oh-sxaDRTcyAr6pFRbXyzA'
 
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=booking_management
+      - KAFKA_BROKERS=kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
   postgres:
     image: postgres:latest
     environment:
@@ -75,6 +92,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./booking-management/db/scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

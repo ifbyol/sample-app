@@ -37,3 +37,5 @@ booking/bin/
 booking-management/booking-management
 booking-management/booking
 booking-management/bin/
+worker/worker
+worker/bin/
