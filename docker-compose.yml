@@ -15,7 +15,8 @@ services:
       - DB_PASS=postgres
       - DB_NAME=booking_management
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   payments:
     build:
