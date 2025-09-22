@@ -26,23 +26,23 @@ func NewRouter(cfg *config.Config) *mux.Router {
 	r.HandleFunc("/healthz", handlers.Health).Methods("GET")
 
 	// Admin service proxy routes
-	r.HandleFunc("/admin", proxyHandler.ProxyAdminRoot).Methods("GET")
-	r.HandleFunc("/admin/", proxyHandler.ProxyAdminRoot).Methods("GET")
-	r.HandleFunc("/admin/health", proxyHandler.ProxyAdminHealth).Methods("GET")
-	r.HandleFunc("/admin/employee", proxyHandler.ProxyAdminEmployees).Methods("GET", "POST")
-	r.HandleFunc("/admin/complaint", proxyHandler.ProxyAdminComplaints).Methods("GET", "POST")
+	r.HandleFunc("/admin", proxyHandler.ProxyAdminRoot).Methods("GET", "OPTIONS")
+	r.HandleFunc("/admin/", proxyHandler.ProxyAdminRoot).Methods("GET", "OPTIONS")
+	r.HandleFunc("/admin/health", proxyHandler.ProxyAdminHealth).Methods("GET", "OPTIONS")
+	r.HandleFunc("/admin/employee", proxyHandler.ProxyAdminEmployees).Methods("GET", "POST", "OPTIONS")
+	r.HandleFunc("/admin/complaint", proxyHandler.ProxyAdminComplaints).Methods("GET", "POST", "OPTIONS")
 
 	// Booking service proxy routes
-	r.HandleFunc("/booking/health", proxyHandler.ProxyBookingHealth).Methods("GET")
-	r.HandleFunc("/booking/book", proxyHandler.ProxyBookingBook).Methods("POST")
-	r.HandleFunc("/booking/cancel", proxyHandler.ProxyBookingCancel).Methods("POST")
+	r.HandleFunc("/booking/health", proxyHandler.ProxyBookingHealth).Methods("GET", "OPTIONS")
+	r.HandleFunc("/booking/book", proxyHandler.ProxyBookingBook).Methods("POST", "OPTIONS")
+	r.HandleFunc("/booking/cancel", proxyHandler.ProxyBookingCancel).Methods("POST", "OPTIONS")
 
 	// Booking-management service proxy routes
-	r.HandleFunc("/booking-management/healthz", proxyHandler.ProxyBookingMgmtHealthz).Methods("GET")
-	r.HandleFunc("/booking-management/users", proxyHandler.ProxyBookingMgmtUsers).Methods("GET")
-	r.HandleFunc("/booking-management/rooms", proxyHandler.ProxyBookingMgmtRooms).Methods("GET")
-	r.HandleFunc("/booking-management/bookings", proxyHandler.ProxyBookingMgmtBookings).Methods("GET")
-	r.HandleFunc("/booking-management/validate", proxyHandler.ProxyBookingMgmtValidate).Methods("POST")
+	r.HandleFunc("/booking-management/healthz", proxyHandler.ProxyBookingMgmtHealthz).Methods("GET", "OPTIONS")
+	r.HandleFunc("/booking-management/users", proxyHandler.ProxyBookingMgmtUsers).Methods("GET", "OPTIONS")
+	r.HandleFunc("/booking-management/rooms", proxyHandler.ProxyBookingMgmtRooms).Methods("GET", "OPTIONS")
+	r.HandleFunc("/booking-management/bookings", proxyHandler.ProxyBookingMgmtBookings).Methods("GET", "OPTIONS")
+	r.HandleFunc("/booking-management/validate", proxyHandler.ProxyBookingMgmtValidate).Methods("POST", "OPTIONS")
 
 	return r
 }

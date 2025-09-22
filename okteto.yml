@@ -11,6 +11,8 @@ build:
     context: ./admin
   gateway:
     context: ./gateway
+  frontend:
+    context: ./frontend
 
 deploy:
   compose: docker-compose.yml
@@ -107,3 +109,16 @@ dev:
       - 8082:8082
     environment:
       - PORT=8082
+
+  frontend:
+    image: okteto/node:20
+    command: bash
+    workdir: /app
+    sync:
+      - ./frontend:/app
+    forward:
+      - 3080:3000
+    environment:
+      - GATEWAY_API_BASE_URL=http://localhost:8082
+      - IGNORE_SSL_ERRORS=true
+      - PORT=3000

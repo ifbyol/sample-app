@@ -79,6 +79,17 @@ func (p *ProxyHandler) proxyToService(w http.ResponseWriter, r *http.Request, se
 
 	logger.Info(ctx, "Proxying request", "method", r.Method, "path", path, "service", serviceURL)
 
+	// Handle OPTIONS requests directly for CORS preflight
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, baggage, Baggage, X-Requested-With")
+		w.Header().Set("Access-Control-Max-Age", "86400") // 24 hours
+		w.WriteHeader(http.StatusOK)
+		logger.Info(ctx, "Handled OPTIONS preflight request", "service", serviceURL)
+		return
+	}
+
 	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -110,12 +121,21 @@ func (p *ProxyHandler) proxyToService(w http.ResponseWriter, r *http.Request, se
 	}
 	defer resp.Body.Close()
 
-	// Copy response headers
+	// Copy response headers (skip CORS headers as they're handled by gateway middleware)
 	for key, values := range resp.Header {
+		// Skip CORS-related headers to avoid conflicts with gateway CORS middleware
+		if strings.HasPrefix(strings.ToLower(key), "access-control-") {
+			continue
+		}
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
 	}
+
+	// Ensure CORS headers are set for all responses
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, baggage, Baggage, X-Requested-With")
 
 	// Copy status code
 	w.WriteHeader(resp.StatusCode)
