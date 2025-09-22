@@ -97,6 +97,11 @@ const BookingsPage: React.FC = () => {
     return user ? `${user.name} ${user.surname} (${user.email})` : `User ${userId}`;
   };
 
+  const getUserUsername = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    return user ? user.username : `User ${userId}`;
+  };
+
   const getRoomIdentifier = (roomId: number) => {
     const room = rooms.find(r => r.id === roomId);
     return room ? `${room.name} - Floor ${room.floor}` : `Room ${roomId}`;
@@ -262,7 +267,7 @@ const BookingsPage: React.FC = () => {
                   {booking.status === 'Accepted' && (
                     <button
                       className="btn btn-secondary"
-                      onClick={() => handleCancel(booking.id.toString(), getUserIdentifier(booking.user_id))}
+                      onClick={() => handleCancel(booking.id.toString(), getUserUsername(booking.user_id))}
                       style={{ fontSize: '12px', padding: '5px 10px' }}
                     >
                       Cancel
