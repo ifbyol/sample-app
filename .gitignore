@@ -35,4 +35,5 @@ go.work.sum
 booking/booking
 booking/bin/
 booking-management/booking-management
+booking-management/booking
 booking-management/bin/
