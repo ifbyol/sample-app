@@ -17,11 +17,13 @@ func NewRouter(db *database.DB) *mux.Router {
 	userHandler := handlers.NewUserHandler(db)
 	roomHandler := handlers.NewRoomHandler(db)
 	bookingHandler := handlers.NewBookingHandler(db)
+	validationHandler := handlers.NewValidationHandler(db)
 
 	router.HandleFunc("/healthz", healthHandler.Healthz).Methods("GET")
 	router.HandleFunc("/users", userHandler.GetUsers).Methods("GET")
 	router.HandleFunc("/rooms", roomHandler.GetRooms).Methods("GET")
 	router.HandleFunc("/bookings", bookingHandler.GetBookings).Methods("GET")
+	router.HandleFunc("/validate", validationHandler.ValidateBooking).Methods("POST")
 
 	return router
 }

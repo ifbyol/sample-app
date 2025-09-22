@@ -34,4 +34,5 @@ go.work.sum
 # Build artifacts
 booking/booking
 booking/bin/
+booking-management/booking-management
 booking-management/bin/

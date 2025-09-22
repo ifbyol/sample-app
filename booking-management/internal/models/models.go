@@ -36,3 +36,15 @@ type Booking struct {
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
+
+type ValidationRequest struct {
+	RoomID         int       `json:"room_id"`
+	NumberOfGuests int       `json:"number_of_guests"`
+	StartDate      time.Time `json:"start_date"`
+	EndDate        time.Time `json:"end_date"`
+}
+
+type ValidationResponse struct {
+	IsValid bool     `json:"isValid"`
+	Reasons []string `json:"reasons"`
+}
