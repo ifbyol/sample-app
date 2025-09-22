@@ -11,7 +11,11 @@ export interface User {
 
 export interface Room {
   id: number;
-  internal_room_id: string;
+  internal_id: string;
+  name: string;
+  floor: number;
+  bathrooms: number;
+  beds: number;
   capacity: number;
   created_at: string;
   updated_at: string;
@@ -72,16 +76,15 @@ export interface Complaint {
 }
 
 export interface ValidationRequest {
-  room_id: number;
+  room_id: string;
   number_of_guests: number;
   start_date: string;
   end_date: string;
 }
 
 export interface ValidationResponse {
-  valid: boolean;
-  message?: string;
-  errors?: string[];
+  isValid: boolean;
+  reasons?: string[] | null;
 }
 
 export interface ApiResponse<T> {

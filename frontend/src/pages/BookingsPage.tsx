@@ -47,7 +47,14 @@ const BookingsPage: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const response = await apiService.createBooking(formData);
+      // Convert datetime-local format to ISO 8601 with timezone
+      const bookingData: BookingRequest = {
+        ...formData,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString()
+      };
+
+      const response = await apiService.createBooking(bookingData);
       if (response.success) {
         // Refresh bookings
         const updatedBookings = await apiService.getBookings();
@@ -92,7 +99,7 @@ const BookingsPage: React.FC = () => {
 
   const getRoomIdentifier = (roomId: number) => {
     const room = rooms.find(r => r.id === roomId);
-    return room?.internal_room_id || `Room ${roomId}`;
+    return room ? `${room.name} - Floor ${room.floor}` : `Room ${roomId}`;
   };
 
   if (loading) {
@@ -144,8 +151,8 @@ const BookingsPage: React.FC = () => {
                 >
                   <option value="">Select a room</option>
                   {rooms.map(room => (
-                    <option key={room.id} value={room.internal_room_id}>
-                      {room.internal_room_id} (Capacity: {room.capacity})
+                    <option key={room.id} value={room.internal_id}>
+                      {room.name} - Floor {room.floor} (Capacity: {room.capacity})
                     </option>
                   ))}
                 </select>

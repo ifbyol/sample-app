@@ -7,7 +7,7 @@ const RoomsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showValidation, setShowValidation] = useState(false);
   const [validationForm, setValidationForm] = useState<ValidationRequest>({
-    room_id: 0,
+    room_id: '',
     number_of_guests: 1,
     start_date: '',
     end_date: '',
@@ -36,12 +36,20 @@ const RoomsPage: React.FC = () => {
     setValidationResult(null);
 
     try {
-      const result = await apiService.validateBooking(validationForm);
+      // Convert datetime-local format to ISO 8601 with timezone
+      const validationData: ValidationRequest = {
+        room_id: validationForm.room_id,
+        number_of_guests: validationForm.number_of_guests,
+        start_date: new Date(validationForm.start_date).toISOString(),
+        end_date: new Date(validationForm.end_date).toISOString()
+      };
+
+      const result = await apiService.validateBooking(validationData);
       setValidationResult(result);
     } catch (error: any) {
       setValidationResult({
-        valid: false,
-        message: error.response?.data?.message || 'Validation failed',
+        isValid: false,
+        reasons: [error.response?.data?.message || 'Validation failed'],
       });
     } finally {
       setValidating(false);
@@ -70,13 +78,13 @@ const RoomsPage: React.FC = () => {
                 <label>Room</label>
                 <select
                   value={validationForm.room_id}
-                  onChange={(e) => setValidationForm({ ...validationForm, room_id: parseInt(e.target.value) })}
+                  onChange={(e) => setValidationForm({ ...validationForm, room_id: e.target.value })}
                   required
                 >
-                  <option value={0}>Select a room</option>
+                  <option value="">Select a room</option>
                   {rooms.map(room => (
-                    <option key={room.id} value={room.id}>
-                      {room.internal_room_id} (Capacity: {room.capacity})
+                    <option key={room.id} value={room.internal_id}>
+                      {room.name} - Floor {room.floor} (Capacity: {room.capacity})
                     </option>
                   ))}
                 </select>
@@ -121,14 +129,13 @@ const RoomsPage: React.FC = () => {
 
             {validationResult && (
               <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '4px' }}>
-                <h4 style={{ color: validationResult.valid ? '#28a745' : '#dc3545' }}>
-                  {validationResult.valid ? '✓ Booking Valid' : '✗ Booking Invalid'}
+                <h4 style={{ color: validationResult.isValid ? '#28a745' : '#dc3545' }}>
+                  {validationResult.isValid ? '✓ Booking Valid' : '✗ Booking Invalid'}
                 </h4>
-                {validationResult.message && <p>{validationResult.message}</p>}
-                {validationResult.errors && validationResult.errors.length > 0 && (
+                {validationResult.reasons && validationResult.reasons.length > 0 && (
                   <ul>
-                    {validationResult.errors.map((error, index) => (
-                      <li key={index} style={{ color: '#dc3545' }}>{error}</li>
+                    {validationResult.reasons.map((reason, index) => (
+                      <li key={index} style={{ color: '#dc3545' }}>{reason}</li>
                     ))}
                   </ul>
                 )}
@@ -141,20 +148,24 @@ const RoomsPage: React.FC = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Room Identifier</th>
+              <th>Name</th>
+              <th>Floor</th>
+              <th>Beds</th>
+              <th>Bathrooms</th>
               <th>Capacity</th>
               <th>Created Date</th>
-              <th>Last Updated</th>
             </tr>
           </thead>
           <tbody>
             {rooms.map(room => (
               <tr key={room.id}>
                 <td>{room.id}</td>
-                <td>{room.internal_room_id}</td>
+                <td>{room.name}</td>
+                <td>{room.floor}</td>
+                <td>{room.beds}</td>
+                <td>{room.bathrooms}</td>
                 <td>{room.capacity}</td>
                 <td>{new Date(room.created_at).toLocaleDateString()}</td>
-                <td>{new Date(room.updated_at).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
