@@ -5,19 +5,44 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"gateway/internal/client"
+	"gateway/internal/config"
 	"gateway/internal/handlers"
 	"gateway/internal/middleware"
 )
 
-func NewRouter() *mux.Router {
+func NewRouter(cfg *config.Config) *mux.Router {
 	r := mux.NewRouter()
 
 	// Add middleware
 	r.Use(middleware.BaggageMiddleware)
 
-	// Routes
+	// Create HTTP client and proxy handler
+	httpClient := client.NewHTTPClient()
+	proxyHandler := handlers.NewProxyHandler(httpClient, cfg)
+
+	// Gateway routes
 	r.HandleFunc("/", handlers.Gateway).Methods("GET")
 	r.HandleFunc("/healthz", handlers.Health).Methods("GET")
+
+	// Admin service proxy routes
+	r.HandleFunc("/admin", proxyHandler.ProxyAdminRoot).Methods("GET")
+	r.HandleFunc("/admin/", proxyHandler.ProxyAdminRoot).Methods("GET")
+	r.HandleFunc("/admin/health", proxyHandler.ProxyAdminHealth).Methods("GET")
+	r.HandleFunc("/admin/employee", proxyHandler.ProxyAdminEmployees).Methods("GET", "POST")
+	r.HandleFunc("/admin/complaint", proxyHandler.ProxyAdminComplaints).Methods("GET", "POST")
+
+	// Booking service proxy routes
+	r.HandleFunc("/booking/health", proxyHandler.ProxyBookingHealth).Methods("GET")
+	r.HandleFunc("/booking/book", proxyHandler.ProxyBookingBook).Methods("POST")
+	r.HandleFunc("/booking/cancel", proxyHandler.ProxyBookingCancel).Methods("POST")
+
+	// Booking-management service proxy routes
+	r.HandleFunc("/booking-management/healthz", proxyHandler.ProxyBookingMgmtHealthz).Methods("GET")
+	r.HandleFunc("/booking-management/users", proxyHandler.ProxyBookingMgmtUsers).Methods("GET")
+	r.HandleFunc("/booking-management/rooms", proxyHandler.ProxyBookingMgmtRooms).Methods("GET")
+	r.HandleFunc("/booking-management/bookings", proxyHandler.ProxyBookingMgmtBookings).Methods("GET")
+	r.HandleFunc("/booking-management/validate", proxyHandler.ProxyBookingMgmtValidate).Methods("POST")
 
 	return r
 }

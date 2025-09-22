@@ -21,7 +21,7 @@ func main() {
 	logger.Info(ctx, "Starting Gateway service", "port", cfg.Port)
 
 	// Create router
-	r := router.NewRouter()
+	r := router.NewRouter(cfg)
 
 	// Apply CORS middleware
 	handler := router.EnableCORS(r)
