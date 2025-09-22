@@ -12,7 +12,15 @@ router.get('/', (req, res) => {
     description: 'Admin service for booking management system',
     endpoints: {
       health: '/health',
-      root: '/'
+      root: '/',
+      employees: {
+        getAll: 'GET /admin/employee',
+        create: 'POST /admin/employee'
+      },
+      complaints: {
+        getAll: 'GET /admin/complaint',
+        create: 'POST /admin/complaint'
+      }
     },
     timestamp: new Date().toISOString()
   };

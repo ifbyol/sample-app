@@ -24,10 +24,10 @@ CREATE TABLE IF NOT EXISTS complaints (
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_employees_position ON employees(position);
-CREATE INDEX IF NOT EXISTS idx_employees_hiring_date ON employees(date_of_hiring);
-CREATE INDEX IF NOT EXISTS idx_complaints_date ON complaints(date);
-CREATE INDEX IF NOT EXISTS idx_complaints_customer ON complaints(customer);
+CREATE INDEX idx_employees_position ON employees(position);
+CREATE INDEX idx_employees_hiring_date ON employees(date_of_hiring);
+CREATE INDEX idx_complaints_date ON complaints(date);
+CREATE INDEX idx_complaints_customer ON complaints(customer);
 
 -- Insert fake data for Employees
 INSERT INTO employees (name, last_name, date_of_hiring, date_of_birthday, position) VALUES

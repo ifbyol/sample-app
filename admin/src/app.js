@@ -12,6 +12,8 @@ const logger = require('./utils/logger');
 // Import routes
 const healthRoutes = require('./routes/health');
 const indexRoutes = require('./routes/index');
+const employeeRoutes = require('./routes/employees');
+const complaintRoutes = require('./routes/complaints');
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.use((req, res, next) => {
 // Routes
 app.use('/', indexRoutes);
 app.use('/health', healthRoutes);
+app.use('/admin/employee', employeeRoutes);
+app.use('/admin/complaint', complaintRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
