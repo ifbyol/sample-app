@@ -40,6 +40,10 @@ booking-management/bin/
 worker/worker
 worker/bin/
 
+# Gateway service
+gateway/gateway
+gateway/bin/
+
 # Admin service
 admin/node_modules/
 admin/npm-debug.log*

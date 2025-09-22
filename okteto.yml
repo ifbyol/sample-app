@@ -9,6 +9,8 @@ build:
     context: ./worker
   admin:
     context: ./admin
+  gateway:
+    context: ./gateway
 
 deploy:
   compose: docker-compose.yml
@@ -94,3 +96,14 @@ dev:
       - DB_USER=admin
       - DB_PASSWORD=admin
       - DB_NAME=admin_db
+
+  gateway:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./gateway:/app
+    forward:
+      - 8082:8082
+    environment:
+      - PORT=8082

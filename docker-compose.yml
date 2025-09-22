@@ -100,6 +100,15 @@ services:
       mysql:
         condition: service_started
 
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+
   postgres:
     image: postgres:latest
     environment:
