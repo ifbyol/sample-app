@@ -12,6 +12,7 @@ import (
 	"worker/internal/kafka"
 	"worker/internal/logger"
 	"worker/internal/models"
+	"worker/internal/repository"
 )
 
 func main() {
@@ -28,8 +29,12 @@ func main() {
 
 	logger.Info(ctx, "Connected to database successfully")
 
+	// Create repositories
+	bookingRepo := repository.NewBookingRepository(db.DB)
+
+	// Create event handlers with dependency injection
 	handlers := kafka.EventHandlers{
-		BookingHandler:      handleBookingEvent,
+		BookingHandler:      createBookingHandler(bookingRepo),
 		CancellationHandler: handleCancellationEvent,
 	}
 
@@ -53,14 +58,30 @@ func main() {
 	cancel()
 }
 
-func handleBookingEvent(ctx context.Context, event models.BookingEvent) error {
-	logger.Info(ctx, "Processing booking event",
-		"bookingId", event.BookingID,
-		"userId", event.UserID,
-		"roomId", event.RoomID,
-		"paymentId", event.PaymentID)
+func createBookingHandler(repo *repository.BookingRepository) func(context.Context, models.BookingEvent) error {
+	return func(ctx context.Context, event models.BookingEvent) error {
+		logger.Info(ctx, "Processing booking event",
+			"bookingId", event.BookingID,
+			"userId", event.UserID,
+			"roomId", event.RoomID,
+			"paymentId", event.PaymentID,
+			"guests", event.Guests)
 
-	return nil
+		err := repo.CreateBooking(ctx, event)
+		if err != nil {
+			logger.Error(ctx, "Failed to create booking in database",
+				"bookingId", event.BookingID,
+				"error", err)
+			return err
+		}
+
+		logger.Info(ctx, "Successfully created booking in database",
+			"bookingId", event.BookingID,
+			"userId", event.UserID,
+			"roomId", event.RoomID)
+
+		return nil
+	}
 }
 
 func handleCancellationEvent(ctx context.Context, event models.CancellationEvent) error {
