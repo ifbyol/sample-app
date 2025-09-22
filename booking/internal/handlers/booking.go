@@ -97,6 +97,7 @@ func (bh *BookingHandler) Book(w http.ResponseWriter, r *http.Request) {
 		StartDate: bookingReq.StartDate,
 		EndDate:   bookingReq.EndDate,
 		BookingID: bookingID,
+		PaymentID: bookingReq.PaymentID,
 	}
 
 	// Publish to Kafka
