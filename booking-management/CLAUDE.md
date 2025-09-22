@@ -74,7 +74,29 @@ make build && make start
 - `GET /healthz` - Health check endpoint
 - `GET /users` - List all users
 - `GET /rooms` - List all rooms
-- `GET /bookings` - List all bookings
+- `GET /bookings` - List all bookings with payment information and status
+
+### Booking Response Format
+Bookings now include payment tracking and status information:
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "room_id": 1,
+  "number_of_guests": 2,
+  "start_date": "2024-01-15T00:00:00Z",
+  "end_date": "2024-01-18T00:00:00Z",
+  "payment_id": "pay_abc123",
+  "status": "Accepted",
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z"
+}
+```
+
+### Booking Status Values
+- `Accepted` - Booking confirmed and accepted
+- `Cancelled` - Booking has been cancelled
+- `Refused` - Booking request was refused
 
 ## Baggage Header Propagation
 
@@ -129,10 +151,14 @@ func (h *Handler) MyEndpoint(w http.ResponseWriter, r *http.Request) {
 - Connection pooling is handled by the `database/sql` package
 - Always close rows and handle errors properly
 
-### Migrations
+### Database Schema
 - Database schema is initialized via `db/scripts/init.sql`
 - Script includes table creation and sample data
 - Runs automatically in Docker containers
+- Bookings table includes:
+  - `payment_id` - References payment transactions
+  - `status` - Booking status with values: Accepted, Cancelled, Refused
+  - Database constraint ensures valid status values
 
 ### Query Patterns
 - Use parameterized queries to prevent SQL injection

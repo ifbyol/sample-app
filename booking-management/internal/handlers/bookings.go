@@ -22,7 +22,7 @@ func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 	logger.Info(ctx, "Fetching bookings")
 
 	query := `
-		SELECT id, user_id, room_id, number_of_guests, start_date, end_date, created_at, updated_at
+		SELECT id, user_id, room_id, number_of_guests, start_date, end_date, payment_id, status, created_at, updated_at
 		FROM bookings
 		ORDER BY id ASC
 	`
@@ -45,6 +45,8 @@ func (h *BookingHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 			&booking.NumberOfGuests,
 			&booking.StartDate,
 			&booking.EndDate,
+			&booking.PaymentID,
+			&booking.Status,
 			&booking.CreatedAt,
 			&booking.UpdatedAt,
 		)

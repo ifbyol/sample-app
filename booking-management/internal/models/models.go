@@ -31,6 +31,8 @@ type Booking struct {
 	NumberOfGuests int       `json:"number_of_guests" db:"number_of_guests"`
 	StartDate      time.Time `json:"start_date" db:"start_date"`
 	EndDate        time.Time `json:"end_date" db:"end_date"`
+	PaymentID      *string   `json:"payment_id" db:"payment_id"`
+	Status         string    `json:"status" db:"status"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
