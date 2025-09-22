@@ -35,7 +35,7 @@ func main() {
 	// Create event handlers with dependency injection
 	handlers := kafka.EventHandlers{
 		BookingHandler:      createBookingHandler(bookingRepo),
-		CancellationHandler: handleCancellationEvent,
+		CancellationHandler: createCancellationHandler(bookingRepo),
 	}
 
 	consumer, err := kafka.NewConsumer(cfg.KafkaBrokers, handlers)
@@ -84,10 +84,26 @@ func createBookingHandler(repo *repository.BookingRepository) func(context.Conte
 	}
 }
 
-func handleCancellationEvent(ctx context.Context, event models.CancellationEvent) error {
-	logger.Info(ctx, "Processing cancellation event",
-		"bookingId", event.BookingID,
-		"userId", event.UserID)
+func createCancellationHandler(repo *repository.BookingRepository) func(context.Context, models.CancellationEvent) error {
+	return func(ctx context.Context, event models.CancellationEvent) error {
+		logger.Info(ctx, "Processing cancellation event",
+			"bookingId", event.BookingID,
+			"userId", event.UserID,
+			"timestamp", event.Timestamp)
 
-	return nil
+		err := repo.CancelBooking(ctx, event)
+		if err != nil {
+			logger.Error(ctx, "Failed to cancel booking in database",
+				"bookingId", event.BookingID,
+				"userId", event.UserID,
+				"error", err)
+			return err
+		}
+
+		logger.Info(ctx, "Successfully cancelled booking in database",
+			"bookingId", event.BookingID,
+			"userId", event.UserID)
+
+		return nil
+	}
 }

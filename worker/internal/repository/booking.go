@@ -92,3 +92,35 @@ func (r *BookingRepository) getRoomIDByInternalID(ctx context.Context, internalI
 
 	return roomID, nil
 }
+
+func (r *BookingRepository) CancelBooking(ctx context.Context, event models.CancellationEvent) error {
+	// Update the booking status to 'Cancelled' based on booking ID and user ID
+	query := `
+		UPDATE bookings
+		SET status = 'Cancelled', updated_at = $1
+		WHERE id = $2 AND user_id = $3 AND status != 'Cancelled'
+	`
+
+	// First, get the user ID from the UserID string
+	userID, err := r.getUserIDByIdentifier(ctx, event.UserID)
+	if err != nil {
+		return fmt.Errorf("failed to get user ID for cancellation: %w", err)
+	}
+
+	now := time.Now()
+	result, err := r.db.ExecContext(ctx, query, now, event.BookingID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to update booking status to cancelled: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no booking found to cancel with ID %s for user %s, or booking already cancelled", event.BookingID, event.UserID)
+	}
+
+	return nil
+}
