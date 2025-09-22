@@ -19,6 +19,7 @@ func NewRouter(paymentClient *client.PaymentClient, kafkaClient *kafka.Client) *
 
 	router.HandleFunc("/health", healthHandler.Health).Methods("GET")
 	router.HandleFunc("/book", bookingHandler.Book).Methods("POST")
+	router.HandleFunc("/cancel", bookingHandler.Cancel).Methods("POST")
 
 	return router
 }

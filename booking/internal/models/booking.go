@@ -36,3 +36,19 @@ type BookingEvent struct {
 	EndDate   time.Time `json:"endDate"`
 	BookingID string    `json:"bookingId"`
 }
+
+type CancellationRequest struct {
+	BookingID string `json:"bookingId"`
+	UserID    string `json:"userId"`
+}
+
+type CancellationResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type CancellationEvent struct {
+	BookingID string    `json:"bookingId"`
+	UserID    string    `json:"userId"`
+	Timestamp time.Time `json:"timestamp"`
+}

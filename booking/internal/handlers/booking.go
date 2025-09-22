@@ -125,6 +125,56 @@ func (bh *BookingHandler) Book(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func (bh *BookingHandler) Cancel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	logger.Info(ctx, "Processing booking cancellation request")
+
+	var cancellationReq models.CancellationRequest
+	if err := json.NewDecoder(r.Body).Decode(&cancellationReq); err != nil {
+		logger.Error(ctx, "Failed to decode cancellation request", "error", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if cancellationReq.BookingID == "" || cancellationReq.UserID == "" {
+		logger.Error(ctx, "Missing required fields in cancellation request")
+		http.Error(w, "Missing required fields: bookingId and userId are required", http.StatusBadRequest)
+		return
+	}
+
+	// Create cancellation event for Kafka
+	cancellationEvent := models.CancellationEvent{
+		BookingID: cancellationReq.BookingID,
+		UserID:    cancellationReq.UserID,
+		Timestamp: time.Now(),
+	}
+
+	// Publish to Kafka
+	if err := bh.kafkaClient.SendMessage(ctx, "booking-cancellations", cancellationReq.BookingID, cancellationEvent); err != nil {
+		logger.Error(ctx, "Failed to publish cancellation event to Kafka", "error", err)
+		response := models.CancellationResponse{
+			Success: false,
+			Message: "Cancellation event publishing failed",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	logger.Info(ctx, "Booking cancellation completed successfully", "bookingId", cancellationReq.BookingID, "userId", cancellationReq.UserID)
+
+	response := models.CancellationResponse{
+		Success: true,
+		Message: "Booking cancellation completed successfully",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, length)
