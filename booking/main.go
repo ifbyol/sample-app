@@ -31,7 +31,10 @@ func main() {
 	// Initialize payment client
 	paymentClient := client.NewPaymentClient(cfg.PaymentServiceURL)
 
-	r := router.NewRouter(paymentClient, kafkaClient)
+	// Initialize booking management client
+	bookingManagementClient := client.NewBookingManagementClient(cfg.BookingManagementServiceURL)
+
+	r := router.NewRouter(paymentClient, kafkaClient, bookingManagementClient)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Port),

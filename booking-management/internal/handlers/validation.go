@@ -33,7 +33,7 @@ func (h *ValidationHandler) ValidateBooking(w http.ResponseWriter, r *http.Reque
 	var reasons []string
 
 	// Validate room exists and get room details
-	room, err := h.getRoomByID(req.RoomID)
+	room, err := h.getRoomByInternalID(req.RoomID)
 	if err != nil {
 		logger.Error(ctx, "Failed to fetch room", "error", err, "room_id", req.RoomID)
 		reasons = append(reasons, "Room does not exist")
@@ -53,7 +53,7 @@ func (h *ValidationHandler) ValidateBooking(w http.ResponseWriter, r *http.Reque
 
 	// Validate room availability
 	if room != nil {
-		isAvailable, err := h.isRoomAvailable(req.RoomID, req.StartDate, req.EndDate)
+		isAvailable, err := h.isRoomAvailableByInternalID(req.RoomID, req.StartDate, req.EndDate)
 		if err != nil {
 			logger.Error(ctx, "Failed to check room availability", "error", err)
 			reasons = append(reasons, "Unable to verify room availability")
@@ -86,12 +86,13 @@ func (h *ValidationHandler) ValidateBooking(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *ValidationHandler) getRoomByID(roomID int) (*models.Room, error) {
-	query := `SELECT id, name, floor, bathrooms, beds, capacity, created_at, updated_at FROM rooms WHERE id = $1`
+func (h *ValidationHandler) getRoomByInternalID(internalID string) (*models.Room, error) {
+	query := `SELECT id, internal_id, name, floor, bathrooms, beds, capacity, created_at, updated_at FROM rooms WHERE internal_id = $1`
 
 	var room models.Room
-	err := h.db.QueryRow(query, roomID).Scan(
+	err := h.db.QueryRow(query, internalID).Scan(
 		&room.ID,
+		&room.InternalID,
 		&room.Name,
 		&room.Floor,
 		&room.Bathrooms,
@@ -108,21 +109,22 @@ func (h *ValidationHandler) getRoomByID(roomID int) (*models.Room, error) {
 	return &room, nil
 }
 
-func (h *ValidationHandler) isRoomAvailable(roomID int, startDate, endDate time.Time) (bool, error) {
+func (h *ValidationHandler) isRoomAvailableByInternalID(internalID string, startDate, endDate time.Time) (bool, error) {
 	query := `
 		SELECT COUNT(*)
-		FROM bookings
-		WHERE room_id = $1
-		AND status = 'Accepted'
+		FROM bookings b
+		JOIN rooms r ON b.room_id = r.id
+		WHERE r.internal_id = $1
+		AND b.status = 'Accepted'
 		AND (
-			(start_date <= $2 AND end_date > $2) OR
-			(start_date < $3 AND end_date >= $3) OR
-			(start_date >= $2 AND end_date <= $3)
+			(b.start_date <= $2 AND b.end_date > $2) OR
+			(b.start_date < $3 AND b.end_date >= $3) OR
+			(b.start_date >= $2 AND b.end_date <= $3)
 		)
 	`
 
 	var count int
-	err := h.db.QueryRow(query, roomID, startDate, endDate).Scan(&count)
+	err := h.db.QueryRow(query, internalID, startDate, endDate).Scan(&count)
 	if err != nil {
 		return false, err
 	}

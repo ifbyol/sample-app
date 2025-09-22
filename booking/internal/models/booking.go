@@ -53,3 +53,15 @@ type CancellationEvent struct {
 	UserID    string    `json:"userId"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+type BookingValidationRequest struct {
+	RoomID         string    `json:"room_id"`
+	NumberOfGuests int       `json:"number_of_guests"`
+	StartDate      time.Time `json:"start_date"`
+	EndDate        time.Time `json:"end_date"`
+}
+
+type BookingValidationResponse struct {
+	IsValid bool     `json:"isValid"`
+	Reasons []string `json:"reasons"`
+}

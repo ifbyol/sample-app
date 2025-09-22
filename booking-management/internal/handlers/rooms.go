@@ -22,7 +22,7 @@ func (h *RoomHandler) GetRooms(w http.ResponseWriter, r *http.Request) {
 	logger.Info(ctx, "Fetching rooms")
 
 	query := `
-		SELECT id, name, floor, bathrooms, beds, capacity, created_at, updated_at
+		SELECT id, internal_id, name, floor, bathrooms, beds, capacity, created_at, updated_at
 		FROM rooms
 		ORDER BY id ASC
 	`
@@ -40,6 +40,7 @@ func (h *RoomHandler) GetRooms(w http.ResponseWriter, r *http.Request) {
 		var room models.Room
 		err := rows.Scan(
 			&room.ID,
+			&room.InternalID,
 			&room.Name,
 			&room.Floor,
 			&room.Bathrooms,

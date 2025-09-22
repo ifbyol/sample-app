@@ -14,14 +14,16 @@ import (
 )
 
 type BookingHandler struct {
-	paymentClient *client.PaymentClient
-	kafkaClient   *kafka.Client
+	paymentClient           *client.PaymentClient
+	kafkaClient             *kafka.Client
+	bookingManagementClient *client.BookingManagementClient
 }
 
-func NewBookingHandler(paymentClient *client.PaymentClient, kafkaClient *kafka.Client) *BookingHandler {
+func NewBookingHandler(paymentClient *client.PaymentClient, kafkaClient *kafka.Client, bookingManagementClient *client.BookingManagementClient) *BookingHandler {
 	return &BookingHandler{
-		paymentClient: paymentClient,
-		kafkaClient:   kafkaClient,
+		paymentClient:           paymentClient,
+		kafkaClient:             kafkaClient,
+		bookingManagementClient: bookingManagementClient,
 	}
 }
 
@@ -54,6 +56,41 @@ func (bh *BookingHandler) Book(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid booking dates", http.StatusBadRequest)
 		return
 	}
+
+	// Validate booking with booking-management service
+	validationReq := models.BookingValidationRequest{
+		RoomID:         bookingReq.RoomID,
+		NumberOfGuests: bookingReq.Guests,
+		StartDate:      bookingReq.StartDate,
+		EndDate:        bookingReq.EndDate,
+	}
+
+	validationResp, err := bh.bookingManagementClient.ValidateBooking(ctx, validationReq)
+	if err != nil {
+		logger.Error(ctx, "Failed to validate booking", "error", err)
+		response := models.BookingResponse{
+			Success: false,
+			Message: "Booking validation failed",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	if !validationResp.IsValid {
+		logger.Error(ctx, "Booking validation failed", "reasons", validationResp.Reasons)
+		response := models.BookingResponse{
+			Success: false,
+			Message: fmt.Sprintf("Booking validation failed: %v", validationResp.Reasons),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	logger.Info(ctx, "Booking validation passed", "room_id", bookingReq.RoomID)
 
 	// Process payment
 	paymentReq := models.PaymentRequest{

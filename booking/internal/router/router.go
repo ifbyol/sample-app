@@ -9,13 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter(paymentClient *client.PaymentClient, kafkaClient *kafka.Client) *mux.Router {
+func NewRouter(paymentClient *client.PaymentClient, kafkaClient *kafka.Client, bookingManagementClient *client.BookingManagementClient) *mux.Router {
 	router := mux.NewRouter()
 
 	router.Use(middleware.BaggageMiddleware)
 
 	healthHandler := handlers.NewHealthHandler()
-	bookingHandler := handlers.NewBookingHandler(paymentClient, kafkaClient)
+	bookingHandler := handlers.NewBookingHandler(paymentClient, kafkaClient, bookingManagementClient)
 
 	router.HandleFunc("/health", healthHandler.Health).Methods("GET")
 	router.HandleFunc("/book", bookingHandler.Book).Methods("POST")

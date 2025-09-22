@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Create Rooms table
 CREATE TABLE IF NOT EXISTS rooms (
     id SERIAL PRIMARY KEY,
+    internal_id VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
     floor INTEGER NOT NULL,
     bathrooms INTEGER NOT NULL,
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS bookings (
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_rooms_internal_id ON rooms(internal_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_room_id ON bookings(room_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_dates ON bookings(start_date, end_date);
@@ -71,28 +73,28 @@ INSERT INTO users (email, username, date_of_birth, name, surname) VALUES
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert fake data for Rooms
-INSERT INTO rooms (name, floor, bathrooms, beds, capacity) VALUES
-    ('Ocean View Suite', 3, 2, 2, 4),
-    ('Mountain Cabin', 1, 1, 1, 2),
-    ('City Penthouse', 10, 3, 3, 6),
-    ('Garden Villa', 1, 2, 2, 4),
-    ('Sky Loft', 8, 1, 1, 2),
-    ('Luxury Suite', 5, 2, 2, 4),
-    ('Cozy Studio', 2, 1, 1, 2),
-    ('Family Room', 4, 2, 3, 6),
-    ('Executive Suite', 7, 2, 2, 4),
-    ('Budget Room', 1, 1, 1, 2),
-    ('Deluxe Double', 6, 1, 2, 3),
-    ('Presidential Suite', 12, 4, 4, 8),
-    ('Standard Twin', 3, 1, 2, 2),
-    ('Junior Suite', 9, 1, 1, 3),
-    ('Superior Room', 4, 1, 2, 4),
-    ('Economy Single', 2, 1, 1, 1),
-    ('Honeymoon Suite', 11, 2, 1, 2),
-    ('Business Room', 8, 1, 1, 2),
-    ('Connecting Rooms', 5, 2, 4, 8),
-    ('Accessible Room', 1, 1, 2, 3)
-ON CONFLICT DO NOTHING;
+INSERT INTO rooms (internal_id, name, floor, bathrooms, beds, capacity) VALUES
+    ('room_ocean_001', 'Ocean View Suite', 3, 2, 2, 4),
+    ('room_mountain_002', 'Mountain Cabin', 1, 1, 1, 2),
+    ('room_penthouse_003', 'City Penthouse', 10, 3, 3, 6),
+    ('room_garden_004', 'Garden Villa', 1, 2, 2, 4),
+    ('room_sky_005', 'Sky Loft', 8, 1, 1, 2),
+    ('room_luxury_006', 'Luxury Suite', 5, 2, 2, 4),
+    ('room_cozy_007', 'Cozy Studio', 2, 1, 1, 2),
+    ('room_family_008', 'Family Room', 4, 2, 3, 6),
+    ('room_executive_009', 'Executive Suite', 7, 2, 2, 4),
+    ('room_budget_010', 'Budget Room', 1, 1, 1, 2),
+    ('room_deluxe_011', 'Deluxe Double', 6, 1, 2, 3),
+    ('room_presidential_012', 'Presidential Suite', 12, 4, 4, 8),
+    ('room_standard_013', 'Standard Twin', 3, 1, 2, 2),
+    ('room_junior_014', 'Junior Suite', 9, 1, 1, 3),
+    ('room_superior_015', 'Superior Room', 4, 1, 2, 4),
+    ('room_economy_016', 'Economy Single', 2, 1, 1, 1),
+    ('room_honeymoon_017', 'Honeymoon Suite', 11, 2, 1, 2),
+    ('room_business_018', 'Business Room', 8, 1, 1, 2),
+    ('room_connecting_019', 'Connecting Rooms', 5, 2, 4, 8),
+    ('room_accessible_020', 'Accessible Room', 1, 1, 2, 3)
+ON CONFLICT (internal_id) DO NOTHING;
 
 -- Insert fake data for Bookings
 INSERT INTO bookings (user_id, room_id, number_of_guests, start_date, end_date, payment_id, status) VALUES

@@ -14,14 +14,15 @@ type User struct {
 }
 
 type Room struct {
-	ID        int       `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Floor     int       `json:"floor" db:"floor"`
-	Bathrooms int       `json:"bathrooms" db:"bathrooms"`
-	Beds      int       `json:"beds" db:"beds"`
-	Capacity  int       `json:"capacity" db:"capacity"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID         int       `json:"id" db:"id"`
+	InternalID string    `json:"internal_id" db:"internal_id"`
+	Name       string    `json:"name" db:"name"`
+	Floor      int       `json:"floor" db:"floor"`
+	Bathrooms  int       `json:"bathrooms" db:"bathrooms"`
+	Beds       int       `json:"beds" db:"beds"`
+	Capacity   int       `json:"capacity" db:"capacity"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type Booking struct {
@@ -38,7 +39,7 @@ type Booking struct {
 }
 
 type ValidationRequest struct {
-	RoomID         int       `json:"room_id"`
+	RoomID         string    `json:"room_id"`
 	NumberOfGuests int       `json:"number_of_guests"`
 	StartDate      time.Time `json:"start_date"`
 	EndDate        time.Time `json:"end_date"`
