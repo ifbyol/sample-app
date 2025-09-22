@@ -17,6 +17,11 @@ const BookingsPage: React.FC = () => {
     startDate: '',
     endDate: '',
   });
+
+  const generatePaymentId = () => {
+    const randomNumber = Math.floor(Math.random() * 900000) + 100000; // 6-digit number (100000-999999)
+    return `pay_${randomNumber}`;
+  };
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,9 +52,10 @@ const BookingsPage: React.FC = () => {
     setSubmitting(true);
 
     try {
-      // Convert datetime-local format to ISO 8601 with timezone
+      // Convert datetime-local format to ISO 8601 with timezone and generate payment ID
       const bookingData: BookingRequest = {
         ...formData,
+        paymentId: generatePaymentId(),
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString()
       };
@@ -125,17 +131,6 @@ const BookingsPage: React.FC = () => {
           <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
             <h3>Create New Booking</h3>
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Payment ID</label>
-                <input
-                  type="text"
-                  value={formData.paymentId}
-                  onChange={(e) => setFormData({ ...formData, paymentId: e.target.value })}
-                  placeholder="pay_123456"
-                  required
-                />
-              </div>
-
               <div className="form-group">
                 <label>Credit Card Number</label>
                 <input

@@ -6,6 +6,7 @@ import BookingsPage from './pages/BookingsPage';
 import AdminPage from './pages/AdminPage';
 import RoomsPage from './pages/RoomsPage';
 import UsersPage from './pages/UsersPage';
+import SystemStatusPage from './pages/SystemStatusPage';
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <Route path="/rooms" element={<RoomsPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/system-status" element={<SystemStatusPage />} />
           </Routes>
         </div>
       </div>

@@ -28,6 +28,9 @@ const Navigation: React.FC = () => {
           <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>
             Admin
           </Link>
+          <Link to="/system-status" className={`nav-link ${isActive('/system-status') ? 'active' : ''}`}>
+            System Status
+          </Link>
         </div>
       </div>
     </nav>

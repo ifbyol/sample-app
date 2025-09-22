@@ -1,86 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import apiService from '../services/api';
-import { HealthResponse } from '../types';
-import CertificateWarning from '../components/CertificateWarning';
-import config from '../utils/config';
+import React from 'react';
 
 const HomePage: React.FC = () => {
-  const [health, setHealth] = useState<{
-    gateway?: HealthResponse;
-    admin?: HealthResponse;
-    booking?: HealthResponse;
-    bookingManagement?: HealthResponse;
-  }>({});
-  const [loading, setLoading] = useState(true);
-  const [certificateError, setCertificateError] = useState(false);
-
-  useEffect(() => {
-    const checkHealth = async () => {
-      try {
-        setCertificateError(false);
-        const [gatewayHealth, adminHealth, bookingHealth, bookingManagementHealth] = await Promise.allSettled([
-          apiService.getGatewayHealth(),
-          apiService.getAdminHealth(),
-          apiService.getBookingHealth(),
-          apiService.getBookingManagementHealth(),
-        ]);
-
-        // Check if any requests failed due to certificate errors
-        const results = [gatewayHealth, adminHealth, bookingHealth, bookingManagementHealth];
-        const hasCertificateError = results.some(result => {
-          if (result.status === 'rejected') {
-            const error = result.reason;
-            return error?.code === 'ERR_CERT_AUTHORITY_INVALID' ||
-                   error?.code === 'ERR_CERT_COMMON_NAME_INVALID' ||
-                   error?.message?.includes('certificate') ||
-                   error?.message?.includes('SSL') ||
-                   error?.message?.includes('CERT') ||
-                   error?.name === 'AxiosError';
-          }
-          return false;
-        });
-
-        if (hasCertificateError && config.apiBaseUrl.startsWith('https://')) {
-          setCertificateError(true);
-        }
-
-        setHealth({
-          gateway: gatewayHealth.status === 'fulfilled' ? gatewayHealth.value : undefined,
-          admin: adminHealth.status === 'fulfilled' ? adminHealth.value : undefined,
-          booking: bookingHealth.status === 'fulfilled' ? bookingHealth.value : undefined,
-          bookingManagement: bookingManagementHealth.status === 'fulfilled' ? bookingManagementHealth.value : undefined,
-        });
-      } catch (error) {
-        console.error('Error checking health:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkHealth();
-  }, []);
-
-  const retryConnection = () => {
-    setLoading(true);
-    setCertificateError(false);
-    // Trigger a re-check after a short delay
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
-  if (loading) {
-    return <div className="loading">Checking system health...</div>;
-  }
-
-  const getHealthStatus = (healthData?: HealthResponse) => {
-    if (!healthData) return 'unhealthy';
-    return healthData.status === 'healthy' ? 'healthy' : 'unhealthy';
-  };
-
-  const getHealthColor = (status: string) => {
-    return status === 'healthy' ? '#28a745' : '#dc3545';
-  };
 
   return (
     <div>
@@ -88,56 +8,18 @@ const HomePage: React.FC = () => {
         <h1>Hotel Booking Management System</h1>
         <p>Welcome to the hotel booking management system. This application provides a complete solution for managing hotel bookings, rooms, users, and administrative tasks.</p>
 
-        {certificateError && (
-          <CertificateWarning
-            apiUrl={config.apiBaseUrl}
-            onRetry={retryConnection}
-          />
-        )}
-      </div>
-
-      <div className="card">
-        <h2>System Health Status</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-          <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <h3>Gateway Service</h3>
-            <div style={{ color: getHealthColor(getHealthStatus(health.gateway)) }}>
-              ● {getHealthStatus(health.gateway)}
-            </div>
-            {health.gateway && (
-              <small>Last checked: {health.gateway.timestamp}</small>
-            )}
-          </div>
-
-          <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <h3>Admin Service</h3>
-            <div style={{ color: getHealthColor(getHealthStatus(health.admin)) }}>
-              ● {getHealthStatus(health.admin)}
-            </div>
-            {health.admin && (
-              <small>Service: {health.admin.service}</small>
-            )}
-          </div>
-
-          <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <h3>Booking Service</h3>
-            <div style={{ color: getHealthColor(getHealthStatus(health.booking)) }}>
-              ● {getHealthStatus(health.booking)}
-            </div>
-            {health.booking && (
-              <small>Service: {health.booking.service}</small>
-            )}
-          </div>
-
-          <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <h3>Booking Management</h3>
-            <div style={{ color: getHealthColor(getHealthStatus(health.bookingManagement)) }}>
-              ● {getHealthStatus(health.bookingManagement)}
-            </div>
-            {health.bookingManagement && (
-              <small>Service: {health.bookingManagement.service}</small>
-            )}
-          </div>
+        <div style={{
+          padding: '15px',
+          backgroundColor: '#e3f2fd',
+          border: '1px solid #2196f3',
+          borderRadius: '4px',
+          marginTop: '20px'
+        }}>
+          <h3 style={{ color: '#1976d2', margin: '0 0 10px 0' }}>Quick Navigation</h3>
+          <p style={{ margin: '0', color: '#424242' }}>
+            Use the navigation menu above to access different sections of the application.
+            Check the <strong>System Status</strong> page to monitor service health in real-time.
+          </p>
         </div>
       </div>
 
