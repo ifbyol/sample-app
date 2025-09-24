@@ -11,8 +11,8 @@ build:
     context: ./admin
   gateway:
     context: ./gateway
-  frontend:
-    context: ./frontend
+  webapp:
+    context: ./webapp
 
 deploy:
   compose: docker-compose.yml
@@ -110,12 +110,12 @@ dev:
     environment:
       - PORT=8082
 
-  frontend:
+  webapp:
     image: okteto/node:20
     command: bash
     workdir: /app
     sync:
-      - ./frontend:/app
+      - ./webapp:/app
     forward:
       - 3080:3000
     environment:

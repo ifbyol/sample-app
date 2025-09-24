@@ -116,9 +116,9 @@ services:
       - booking
       - booking-management
 
-  frontend:
+  webapp:
     build:
-      context: ./frontend
+      context: ./webapp
       dockerfile: Dockerfile
     ports:
       - "3080:80"
