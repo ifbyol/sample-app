@@ -39,7 +39,8 @@ services:
       - PORT=8081
       - KAFKA_BROKERS=kafka:9092
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
 
   kafka:
     image: apache/kafka:4.1.0
@@ -63,6 +64,12 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_LOG_DIRS: '/opt/kafka/logs'
       CLUSTER_ID: 'oh-sxaDRTcyAr6pFRbXyzA'
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   worker:
     build:
@@ -79,7 +86,7 @@ services:
       postgres:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
 
   admin:
     build:
@@ -144,7 +151,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 10s
 
   mysql:
     image: mysql:8.0
@@ -164,7 +171,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 10s
 
 volumes:
   postgres_data:
