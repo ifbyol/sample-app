@@ -33,6 +33,8 @@ The application follows a microservices architecture pattern with the following 
 - **Service Discovery**: Docker-based service names for internal communication
 - **Distributed Tracing**: Baggage header propagation across all services
 
+For a detailed visual representation of the system architecture, see the [Architecture Diagram](./architecture-diagram.md).
+
 ## Quick Start
 
 ### Okteto Deployment
