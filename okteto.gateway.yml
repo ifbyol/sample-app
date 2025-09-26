@@ -1,0 +1,19 @@
+deploy:
+  compose:
+    file: docker-compose.yml
+    services:
+      - gateway
+  divert:
+    namespace: $SHARED_NAMESPACE
+
+dev:
+  gateway:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./gateway:/app
+    forward:
+      - 8082:8082
+    environment:
+      - PORT=8082
