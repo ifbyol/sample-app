@@ -64,12 +64,6 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_LOG_DIRS: '/opt/kafka/logs'
       CLUSTER_ID: 'oh-sxaDRTcyAr6pFRbXyzA'
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
   worker:
     build:
@@ -146,12 +140,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./booking-management/db/scripts:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d booking_management"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
   mysql:
     image: mysql:8.0
@@ -166,12 +154,6 @@ services:
       - mysql_data:/var/lib/mysql
       - ./admin/db/scripts:/docker-entrypoint-initdb.d
     command: --default-authentication-plugin=mysql_native_password
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
 volumes:
   postgres_data:
