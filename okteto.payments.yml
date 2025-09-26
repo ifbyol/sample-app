@@ -1,0 +1,21 @@
+deploy:
+  compose:
+    file: docker-compose.yml
+    services:
+      - payments
+  divert:
+    namespace: $SHARED_NAMESPACE
+
+dev:
+  payments:
+    image: okteto/node:20
+    command: bash
+    workdir: /app
+    sync:
+      - ./payments:/app
+    forward:
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
