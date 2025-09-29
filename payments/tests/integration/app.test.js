@@ -1,20 +1,5 @@
-const { describe, test, expect, beforeAll, afterAll, beforeEach } = require('@jest/globals');
+const { describe, test, expect, beforeAll, afterAll } = require('@jest/globals');
 const request = require('supertest');
-
-// Mock external HTTP calls
-jest.mock('axios', () => ({
-  create: jest.fn(() => ({
-    defaults: { headers: {} },
-    interceptors: {
-      request: { use: jest.fn() },
-      response: { use: jest.fn() }
-    },
-    post: jest.fn().mockResolvedValue({
-      status: 200,
-      headers: { 'content-type': 'application/json' }
-    })
-  }))
-}));
 
 const app = require('../../src/index');
 
@@ -31,9 +16,6 @@ describe('Payments Service Integration Tests', () => {
     server.close(done);
   });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe('Application Health', () => {
     test('should respond to root endpoint', async () => {
@@ -135,7 +117,7 @@ describe('Payments Service Integration Tests', () => {
       expect(response.body).toEqual({
         success: true,
         paymentId: 'pay_complete_flow_test',
-        transactionId: expect.stringMatching(/^txn_\d+$/),
+        transactionId: expect.stringMatching(/^txn_\d+_[a-z0-9]{9}$/),
         status: 'completed',
         message: 'Payment processed successfully'
       });
@@ -201,36 +183,39 @@ describe('Payments Service Integration Tests', () => {
   });
 
   describe('Error Handling', () => {
-    test('should handle unexpected errors gracefully', async () => {
-      // Mock axios to throw an error - need to set up fresh mock
-      const axios = require('axios');
-
-      // Reset all mocks first
-      jest.clearAllMocks();
-
-      const mockAxiosInstance = {
-        defaults: { headers: {} },
-        interceptors: {
-          request: { use: jest.fn() },
-          response: { use: jest.fn() }
-        },
-        post: jest.fn().mockRejectedValue(new Error('Network timeout'))
-      };
-      axios.create.mockReturnValue(mockAxiosInstance);
-
+    test('should handle processing errors with special card numbers', async () => {
+      // Test with special card number for processing error
       const response = await request(app)
         .post('/process-payment')
         .send({
           paymentId: 'pay_error_test',
-          cardNumber: '4242424242424242'
+          cardNumber: '4000000000000119'
         })
         .expect(422);
 
       expect(response.body).toEqual({
         success: false,
         paymentId: 'pay_error_test',
-        error: 'Network timeout',
+        error: 'Processing error',
         status: 'failed'
+      });
+    });
+
+    test('should handle card declined scenarios', async () => {
+      // Test with special card number for card declined
+      const response = await request(app)
+        .post('/process-payment')
+        .send({
+          paymentId: 'pay_declined_test',
+          cardNumber: '4000000000000002'
+        })
+        .expect(422);
+
+      expect(response.body).toEqual({
+        success: false,
+        paymentId: 'pay_declined_test',
+        error: 'Card declined',
+        status: 'declined'
       });
     });
 
