@@ -79,7 +79,9 @@ okteto test payments
 - `POST /process-payment` - Process payment with card details
 - `GET /` - Service information and available endpoints
 
-### Payment Processing Example
+### Payment Processing Examples
+
+#### Successful Payment
 ```bash
 curl -X POST http://localhost:3000/process-payment \
   -H "Content-Type: application/json" \
@@ -87,6 +89,28 @@ curl -X POST http://localhost:3000/process-payment \
   -d '{
     "paymentId": "pay_test123",
     "cardNumber": "4242424242424242"
+  }'
+```
+
+#### Card Declined Test
+```bash
+curl -X POST http://localhost:3000/process-payment \
+  -H "Content-Type: application/json" \
+  -H "baggage: trace-id=payment123" \
+  -d '{
+    "paymentId": "pay_declined_test",
+    "cardNumber": "4000000000000002"
+  }'
+```
+
+#### Processing Error Test
+```bash
+curl -X POST http://localhost:3000/process-payment \
+  -H "Content-Type: application/json" \
+  -H "baggage: trace-id=payment123" \
+  -d '{
+    "paymentId": "pay_error_test",
+    "cardNumber": "4000000000000119"
   }'
 ```
 
@@ -114,14 +138,13 @@ The service implements comprehensive baggage header handling for distributed tra
 }
 ```
 
-### HTTP Client Usage
-When making outbound HTTP requests, use the provided HTTP client:
+### Local Payment Simulation Usage
+The service uses local simulation for payment processing:
 ```javascript
-const { createHttpClient } = require('./utils/httpClient');
+const { simulateStripePayment } = require('./utils/httpClient');
 
-// Client automatically propagates baggage headers
-const client = createHttpClient(req);
-const response = await client.post('http://external-service/api', data);
+// Local simulation with realistic delays and outcomes
+const result = await simulateStripePayment(req, paymentId, cardNumber);
 ```
 
 ### Context Usage in Routes
@@ -150,7 +173,7 @@ The service includes comprehensive test coverage:
 #### Unit Tests
 - `tests/unit/middleware/baggage.test.js` - Baggage middleware functionality
 - `tests/unit/utils/logger.test.js` - Context-aware logging
-- `tests/unit/utils/httpClient.test.js` - HTTP client with baggage propagation
+- `tests/unit/utils/httpClient.test.js` - Local payment simulation functionality
 - `tests/unit/routes/payments.test.js` - Payment route handlers
 
 #### Integration Tests
@@ -190,8 +213,9 @@ simulateStripePayment.mockResolvedValue({
 
 ## Payment Processing Flow
 
-### External Service Integration
-The service simulates integration with external payment providers (like Stripe):
+### Local Payment Simulation
+The service uses a local mock simulation for payment processing, eliminating external dependencies and ensuring consistent behavior:
+
 ```javascript
 const result = await simulateStripePayment(req, paymentId, cardNumber);
 if (result.success) {
@@ -201,8 +225,27 @@ if (result.success) {
 }
 ```
 
+### Test Card Numbers for Error Scenarios
+The service supports special test card numbers to simulate different payment outcomes:
+
+- **`4000000000000002`** - Card declined scenario
+  - Returns: `{ success: false, error: 'Card declined', status: 'declined' }`
+
+- **`4000000000000119`** - Processing error scenario
+  - Returns: `{ success: false, error: 'Processing error', status: 'failed' }`
+
+- **Any other valid card number** - Success scenario
+  - Returns: `{ success: true, transactionId: 'txn_...', status: 'completed' }`
+
+### Local Simulation Benefits
+- **No external dependencies**: No network calls to external services
+- **Consistent response times**: 100-300ms processing delay
+- **100% reliability**: No network-related failures
+- **Deterministic testing**: Predictable outcomes based on card numbers
+- **Realistic simulation**: Includes processing delay and transaction IDs
+
 ### Card Number Security
-- Card numbers are masked in all logs and external requests
+- Card numbers are masked in all logs
 - Format: `************4242` (shows last 4 digits)
 - Never log full card numbers in any circumstances
 
@@ -235,9 +278,9 @@ console.log('Payment processed');
 ### Structured Logging
 Include relevant context in logs:
 ```javascript
-log.info('Calling external payment service', {
+log.info('Processing payment with local simulation', {
   paymentId,
-  service: 'stripe-simulation',
+  service: 'local-mock',
   cardNumberMask: '************' + cardNumber.slice(-4)
 });
 ```
@@ -342,10 +385,10 @@ app.use(baggageMiddleware);
 
 ## Performance Considerations
 
-### HTTP Client Configuration
-- 10-second timeout for external requests
-- Proper error handling for network issues
-- Connection reuse for efficiency
+### Local Payment Simulation
+- Fast response times with 100-300ms simulated delay
+- No network latency or external service dependencies
+- Deterministic performance for testing and development
 
 ### Logging Performance
 - Structured logging is efficient but avoid excessive entries
@@ -394,11 +437,11 @@ app.get('/health', (req, res) => {
 4. Write unit and integration tests
 5. Update API documentation
 
-### External Service Integration
-1. Use the provided HTTP client for baggage propagation
-2. Implement proper error handling and timeouts
-3. Log service calls with masked sensitive data
-4. Test both success and failure scenarios
+### Payment Simulation Integration
+1. Use the local payment simulation for consistent behavior
+2. Implement proper error handling for different card scenarios
+3. Log payment processing with masked sensitive data
+4. Test success, decline, and error scenarios using special card numbers
 
 ### Database Operations (Future)
 If adding database functionality:
