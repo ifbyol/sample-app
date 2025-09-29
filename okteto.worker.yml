@@ -1,0 +1,15 @@
+deploy:
+  compose:
+    file: docker-compose.yml
+    services:
+      - worker
+  divert:
+    namespace: $SHARED_NAMESPACE
+
+dev:
+  worker:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./worker:/app

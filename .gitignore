@@ -50,3 +50,6 @@ admin/npm-debug.log*
 admin/yarn-debug.log*
 admin/yarn-error.log*
 admin/.env
+
+# Worker service
+worker/tmp/

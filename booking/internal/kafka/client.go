@@ -8,6 +8,7 @@ import (
 	"github.com/IBM/sarama"
 
 	"booking/internal/logger"
+	"booking/internal/middleware"
 )
 
 // Client represents a Kafka client
@@ -48,6 +49,18 @@ func (c *Client) SendMessage(ctx context.Context, topic string, key string, mess
 		Topic: topic,
 		Key:   sarama.StringEncoder(key),
 		Value: sarama.ByteEncoder(messageBytes),
+	}
+
+	// Add baggage header to Kafka message if present in context
+	if baggage := middleware.GetBaggageFromContext(ctx); baggage != "" {
+		if msg.Headers == nil {
+			msg.Headers = make([]sarama.RecordHeader, 0)
+		}
+		msg.Headers = append(msg.Headers, sarama.RecordHeader{
+			Key:   []byte("baggage"),
+			Value: []byte(baggage),
+		})
+		logger.Info(ctx, "Added baggage header to Kafka message", "topic", topic, "key", key)
 	}
 
 	// Send message

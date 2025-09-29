@@ -3,23 +3,23 @@ package models
 import "time"
 
 type BookingRequest struct {
-	PaymentID       string    `json:"paymentId"`
-	CreditCardNumber string   `json:"creditCardNumber"`
-	RoomID          string    `json:"roomId"`
-	UserID          string    `json:"userId"`
-	Guests          int       `json:"guests"`
-	StartDate       time.Time `json:"startDate"`
-	EndDate         time.Time `json:"endDate"`
+	PaymentID        string    `json:"paymentId"`
+	CreditCardNumber string    `json:"creditCardNumber"`
+	RoomID           string    `json:"roomId"`
+	UserID           string    `json:"userId"`
+	Guests           int       `json:"guests"`
+	StartDate        time.Time `json:"startDate"`
+	EndDate          time.Time `json:"endDate"`
 }
 
 type BookingResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success   bool   `json:"success"`
+	Message   string `json:"message"`
 	BookingID string `json:"bookingId,omitempty"`
 }
 
 type PaymentRequest struct {
-	PaymentID       string `json:"paymentId"`
+	PaymentID        string `json:"paymentId"`
 	CreditCardNumber string `json:"cardNumber"`
 }
 

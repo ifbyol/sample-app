@@ -94,7 +94,7 @@ func (bh *BookingHandler) Book(w http.ResponseWriter, r *http.Request) {
 
 	// Process payment
 	paymentReq := models.PaymentRequest{
-		PaymentID:       bookingReq.PaymentID,
+		PaymentID:        bookingReq.PaymentID,
 		CreditCardNumber: bookingReq.CreditCardNumber,
 	}
 

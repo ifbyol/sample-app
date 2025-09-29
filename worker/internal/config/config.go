@@ -6,12 +6,14 @@ import (
 )
 
 type Config struct {
-	KafkaBrokers []string
-	DBHost       string
-	DBPort       string
-	DBUser       string
-	DBPass       string
-	DBName       string
+	KafkaBrokers      []string
+	DBHost            string
+	DBPort            string
+	DBUser            string
+	DBPass            string
+	DBName            string
+	OktetoDivertedEnv string
+	OktetoNamespace   string
 }
 
 func Load() *Config {
@@ -24,12 +26,14 @@ func Load() *Config {
 	}
 
 	return &Config{
-		KafkaBrokers: brokers,
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBPort:       getEnv("DB_PORT", "5432"),
-		DBUser:       getEnv("DB_USER", "postgres"),
-		DBPass:       getEnv("DB_PASS", "postgres"),
-		DBName:       getEnv("DB_NAME", "booking_management"),
+		KafkaBrokers:      brokers,
+		DBHost:            getEnv("DB_HOST", "localhost"),
+		DBPort:            getEnv("DB_PORT", "5432"),
+		DBUser:            getEnv("DB_USER", "postgres"),
+		DBPass:            getEnv("DB_PASS", "postgres"),
+		DBName:            getEnv("DB_NAME", "booking_management"),
+		OktetoDivertedEnv: getEnv("OKTETO_DIVERTED_ENVIRONMENT", ""),
+		OktetoNamespace:   getEnv("OKTETO_NAMESPACE", "default"),
 	}
 }
 
