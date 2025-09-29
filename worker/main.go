@@ -67,7 +67,7 @@ func createBookingHandler(repo *repository.BookingRepository) func(context.Conte
 			"paymentId", event.PaymentID,
 			"guests", event.Guests)
 
-		/*err := repo.CreateBooking(ctx, event)
+		err := repo.CreateBooking(ctx, event)
 		if err != nil {
 			logger.Error(ctx, "Failed to create booking in database",
 				"bookingId", event.BookingID,
@@ -78,9 +78,7 @@ func createBookingHandler(repo *repository.BookingRepository) func(context.Conte
 		logger.Info(ctx, "Successfully created booking in database",
 			"bookingId", event.BookingID,
 			"userId", event.UserID,
-			"roomId", event.RoomID)*/
-
-		logger.Error(ctx, "I don't create the booking for demo purposes")
+			"roomId", event.RoomID)
 
 		return nil
 	}
