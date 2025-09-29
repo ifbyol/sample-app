@@ -1,0 +1,26 @@
+deploy:
+  compose:
+    file: docker-compose.yml
+    services:
+      - worker
+      - booking
+  divert:
+    namespace: $SHARED_NAMESPACE
+
+dev:
+  worker:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./worker:/app
+  booking:
+    image: okteto/golang:1
+    command: bash
+    workdir: /app
+    sync:
+      - ./booking:/app
+    forward:
+      - 8081:8081
+    environment:
+      - PORT=8081

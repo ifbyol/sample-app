@@ -128,13 +128,14 @@ func (bh *BookingHandler) Book(w http.ResponseWriter, r *http.Request) {
 
 	// Create booking event for Kafka
 	bookingEvent := models.BookingEvent{
-		UserID:    bookingReq.UserID,
-		RoomID:    bookingReq.RoomID,
-		Guests:    bookingReq.Guests,
-		StartDate: bookingReq.StartDate,
-		EndDate:   bookingReq.EndDate,
-		BookingID: bookingID,
-		PaymentID: bookingReq.PaymentID,
+		UserID:        bookingReq.UserID,
+		RoomID:        bookingReq.RoomID,
+		Guests:        bookingReq.Guests,
+		StartDate:     bookingReq.StartDate,
+		EndDate:       bookingReq.EndDate,
+		BookingID:     bookingID,
+		PaymentID:     bookingReq.PaymentID,
+		OperationDate: time.Now(),
 	}
 
 	// Publish to Kafka

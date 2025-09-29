@@ -38,9 +38,9 @@ services:
     environment:
       - PORT=8081
       - KAFKA_BROKERS=kafka:9092
-    depends_on:
-      kafka:
-        condition: service_healthy
+    #depends_on:
+    #  kafka:
+    #    condition: service_healthy
 
   kafka:
     image: apache/kafka:4.1.0
