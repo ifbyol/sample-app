@@ -51,5 +51,8 @@ admin/yarn-debug.log*
 admin/yarn-error.log*
 admin/.env
 
-# Worker service
+#Worker service
 worker/tmp/
+
+# Booking service
+booking/tmp/
