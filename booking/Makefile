@@ -12,8 +12,12 @@ start: build
 
 # Watch for changes and restart automatically using devl
 watch:
-	@echo "Starting development server with file watching..."
-	@devl
+	@echo "Starting worker service in watch mode..."
+	@if ! command -v air > /dev/null 2>&1; then \
+		echo "Air not found. Installing..."; \
+		$(MAKE) install-tools; \
+	fi
+	air
 
 # Clean build artifacts
 clean:
@@ -23,7 +27,8 @@ clean:
 # Install development tools
 install-tools:
 	@echo "Installing development tools..."
-	@go install github.com/marwan-at-work/devl@latest
+	go install github.com/cosmtrek/air@latest
+	@echo "Development tools installed."
 
 # Default target
 help:
