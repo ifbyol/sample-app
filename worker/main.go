@@ -65,8 +65,7 @@ func createBookingHandler(repo *repository.BookingRepository) func(context.Conte
 			"userId", event.UserID,
 			"roomId", event.RoomID,
 			"paymentId", event.PaymentID,
-			"guests", event.Guests,
-			"operationDate", event.OperationDate.String())
+			"guests", event.Guests)
 
 		err := repo.CreateBooking(ctx, event)
 		if err != nil {
