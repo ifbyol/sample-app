@@ -124,7 +124,7 @@ services:
     ports:
       - "3080:80"
     environment:
-      - GATEWAY_API_BASE_URL=https://gateway-${OKTETO_NAMESPACE}.test-nacho.dev.okteto.net
+      - GATEWAY_API_BASE_URL=https://gateway-${OKTETO_NAMESPACE}.${OKTETO_DOMAIN}
       - IGNORE_SSL_ERRORS=true
     depends_on:
       - gateway
