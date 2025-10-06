@@ -1,5 +1,5 @@
 # sample-app
-This is a repository used to store a sample app with testing purposes
+This is a repository used to store a sample app with testing purposes. In this branch, producer of Kafka has some logic to include `baggage` header into Kafka messages, and the consumer has logic to conditionally consume and commit the message based on the value of the baggage header present in the Kafka message, and the value of the environment variable `OKTETO_DIVERTED_ENVIRONMENT`. You can check the source code of `booking` and `worker` services to explore the code.
 
 ## Services
 
@@ -39,11 +39,22 @@ For a detailed visual representation of the system architecture, see the [Archit
 
 ### Okteto Deployment
 ```bash
-# Deploy entire application stack
-okteto deploy --remote
+# Create the namespace used as shared one
+okteto ns create <shared-namespace>
 
-# Or deploy individual services
-okteto build <service-name>
+# Get Kubernetes credentials
+okteto kubeconfig
+
+# Add annotation to the namespace to deploy the proxies
+kubectl annotate namespace <shared-namespace> linkerd.io/inject=enabled
+
+# Deploy entire application stack
+okteto deploy -n <shared-namespace>
+
+# Change namespace to other namespace
+okteto ns use <personal-namespace>
+
+okteto deploy -n <personal-namespace> -f okteto.worker.yml
 ```
 
 ## Service Communication
