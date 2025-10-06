@@ -39,11 +39,22 @@ For a detailed visual representation of the system architecture, see the [Archit
 
 ### Okteto Deployment
 ```bash
-# Deploy entire application stack
-okteto deploy --remote
+# Create the namespace used as shared one
+okteto ns create <shared-namespace>
 
-# Or deploy individual services
-okteto build <service-name>
+# Get Kubernetes credentials
+okteto kubeconfig
+
+# Add annotation to the namespace to deploy the proxies
+kubectl annotate namespace <shared-namespace> linkerd.io/inject=enabled
+
+# Deploy entire application stack
+okteto deploy -n <shared-namespace>
+
+# Change namespace to other namespace
+okteto ns use <personal-namespace>
+
+okteto deploy -n <personal-namespace> -f okteto.payments.yml
 ```
 
 ## Service Communication
