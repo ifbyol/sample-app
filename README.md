@@ -56,7 +56,7 @@ okteto deploy -n <shared-namespace>
 # Change namespace to other namespace
 okteto ns use <personal-namespace>
 
-okteto deploy -n <personal-namespace> -f okteto.worker.yml
+okteto deploy -n <personal-namespace> -f okteto.worker-booking.yml
 ```
 
 ## Service Communication
