@@ -130,7 +130,7 @@ services:
       - gateway
 
   postgres:
-    image: postgres:latest
+    image: postgres:18
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -138,7 +138,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./booking-management/db/scripts:/docker-entrypoint-initdb.d
 
   mysql:
