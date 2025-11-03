@@ -1,5 +1,8 @@
 # sample-app
-This is a repository used to store a sample app with testing purposes
+This is a repository used to store a sample app with testing purposes for Okteto divert. It has different branches with different divert scenarios.
+* `divert-with-simple-service`: This branch contains an Okteto Manifest to divert a simple service of the stack
+* `divert-kafka-consumer-using-headers`: This branch contains an Okteto Manifest to divert a service which consumes from a Kafka topic. In this case is for scenarios where the consumer has to change something in the way a message is consumed
+* `divert-kafka-consumer-producer-using-headers`: This branch contains an Okteto Manifest to divert producer and consumer of a Kafka topic, reusing the same Kafka deployed in the shared namespace. This is for cases where the shape of the message changes, so both sides need a modification
 
 ## Services
 
