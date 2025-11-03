@@ -1,4 +1,5 @@
 # sample-app
+
 This is a repository used to store a sample app with testing purposes. 
 
 In this branch, producer of Kafka has some logic to include `baggage` header into Kafka messages, and the consumer has logic to conditionally consume and commit the message based on the value of the baggage header present in the Kafka message, and the value of the environment variable `OKTETO_DIVERTED_ENVIRONMENT`. You can check the source code of `booking` and `worker` services to explore the code.
